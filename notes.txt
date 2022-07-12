@@ -1,0 +1,64 @@
+
+server: folder that contains the backend code
+client: folder that contains the frontend code
+
+Hooks are React's way of responding to events 
+
+Whitelisting is the practice of explicitly allowing access to a particular
+privilege or service. It is the opposite of blacklisting.
+
+
+Models vs Controllers vs Routers:
+- Always keep routers and controllers together because they have
+a 1-to-1 relationships. In other words, there is ONLY one controller 
+for every router
+- You can have multiple models for each controller. You can also have
+multiple controllers for each model. There is a many-to-many relationship 
+between controllers and models 
+
+- Models: Give us data access functions that controls how the data can be written to and read 
+
+- Controllers: Focus on working with the request and the response 
+
+- Routers: The router will essentially "run" the controller method that 
+is associated with the url - site.com/CONTROLLER/METHOD. The router's 
+job is exactly that, to route the request to the requested 
+controller/method while the controller will "control" and do the 
+processing/generating response
+
+Deployment:
+- https://create-react-app.dev/docs/deployment/
+- npm run build creates a build directory with a production build of 
+your app.
+- 
+
+Logging:
+- Read up on the morgan module here: https://www.npmjs.com/package/morgan
+
+
+Layered Architecture: organizes iOS application into a set of layers.
+A layer is a logical structuring mechanism for the elements that make up the application.
+Traditionally, it consists of 3 parts:
+
+- User Interface: handles interactions between the user and the application
+
+- Data Access: exposes the data stored in external system (CoreData, 
+iCould, REST API) to the business layer 
+
+- Business Logic: The software representation of the business concepts. It constrains 
+the behavior of the app to match with the needs of a specific company.
+
+The layers follow the dependency rule: a higher layer can access any layer below it, 
+but not vice versa. This means that business logic should never call methods from the user 
+interface layer. Such architecture allows to make higher-level details, such as business logic, 
+independent from the lower-level ones.
+
+Your servers must be stateless...persist the state somewhere else like a DATABASE
+
+v8 isolates: 
+- isolated instances of the v8 engine
+- sandboxes that run JS code independently of eachother 
+each v8 isolate handles the JS code for one thread 
+
+https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API
+https://nodejs.org/api/worker_threads.html
