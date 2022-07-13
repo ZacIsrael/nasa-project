@@ -1,8 +1,11 @@
 // gets the launches map from the launches model 
 const {  getAllLaunches, addNewLaunch, launchExists, abortLaunchById } = require('../../models/launches.models');
-
+const { getPagination } = require('../../services/query');
 async function httpGetAllLaunches(req, res){
-    return res.status(200).json(await getAllLaunches());
+    // req.query exposes the query paramaters  
+    console.log('req.query= ', req.query);
+    const { skip, limit } = getPagination(req.query);
+    return res.status(200).json(await getAllLaunches(skip, limit));
 }
 
 async function httpAddNewLaunch(req, res){

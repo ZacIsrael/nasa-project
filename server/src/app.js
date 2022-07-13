@@ -10,6 +10,9 @@ const path = require('path');
 // the machine, and the browser that they're using.
 const morgan = require('morgan');
 
+//  api
+const api_v1 = require('./routes/api-v1');
+
 const planetsRouter = require('./routes/planets/planets.router');
 const launchesRouter = require('./routes/launches/launches.router');
 const app = express();
@@ -30,8 +33,12 @@ app.use(express.json());
 // serves all of the public files 
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
-app.use('/planets', planetsRouter);
-app.use('/launches',launchesRouter);
+// version 1 of the api, this middleware function adds the v1 in front of the requests.
+// for example: http://localhost:8000/v1/launches
+app.use('/v1', api_v1);
+
+// app.use('/planets', planetsRouter);
+// app.use('/launches',launchesRouter);
 
 // tells the express server what to do when it gets the all requests that start with '{domain.com}/' 
 app.get('/*', (req, res) => {

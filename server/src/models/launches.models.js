@@ -1,6 +1,8 @@
 // schedule a launch date
 // We a mission name, a rocket type, a destination exoplanet
 
+const axios = require('axios');
+
 // object used to post to and read documents from the 'launches' collection
 const launches = require('./launches.mongo');
 const planets = require('./planets.mongo');
@@ -11,27 +13,6 @@ const planets = require('./planets.mongo');
 const DEFAULT_FLIGHT_NUMBER = 0;
 
 const testLaunchFN =  getLatestFlightNumber();
-// example launch object
-const testLaunch = {
-
-    flightNumber: DEFAULT_FLIGHT_NUMBER,
-    // mission name 
-    mission: 'Test Mission',
-    // rocket name
-    rocket: 'Rocket123',
-    launchDate: new Date('December 27, 2030'),
-    target: 'Kepler-1649 b',
-    customers: ['NASA', 'ZTM'],
-    // Becomes false once this launch's date has passed
-    upcoming: true,
-    // determines wheter or not a launch was successful
-    success: true
-
-};
-
-// save the launch to the 'launches collection
-// saveLaunch(testLaunch);
-
 
 async function getLatestFlightNumber(){
     // retrieve the launch with the highest flightNumber 
@@ -51,25 +32,23 @@ async function getLatestFlightNumber(){
 }
 
 
-async function getAllLaunches(){
+async function getAllLaunches(skip, limit){
     // retrieve all the documents from the launches collection
     return await launches.find({}, {
         // exclude the version and id of each launch when retrieving them
         '_id': 0,
         '__v': 0
-    });
+    })
+    // sort the returned launch documents by flightNumber: -1 = descending, 1 = ascending
+    .sort({ flightNumber: 1})
+    // use skip and limit functions to implement pagination 
+    .skip(skip)
+    // limit the amount of documents that are returned from Mongo DB
+    .limit(limit);
 }
 
 async function saveLaunch(launch){
-    // manual referential integrity (verify that it planet with that keplerName exists in the planets collection)
-    const planet = await planets.findOne({
-        keplerName: launch.target,
-    });
-    console.log('planet= ', planet)
 
-    if(!planet){
-        throw new Error('The destination planet selected does not exist');
-    }
 
     // findOneAndUpdate only returns the properties that are set in the update (in the launch object)
     await launches.findOneAndUpdate({
@@ -82,8 +61,20 @@ async function saveLaunch(launch){
 }
 
 async function addNewLaunch(launch){
+    // manual referential integrity (verify that it planet with that keplerName exists in the planets collection)
+    const planet = await planets.findOne({
+        keplerName: launch.target,
+    });
+    console.log('planet= ', planet)
+
+    if(!planet){
+        throw new Error('The destination planet selected does not exist');
+    }
+
     // calculate the next flightNumber
     const nextFlightNum = await getLatestFlightNumber() + 1;
+
+
     const newLaunch = Object.assign(launch, {
         // fields added to the launch object
         flightNumber: nextFlightNum,
@@ -99,9 +90,14 @@ async function addNewLaunch(launch){
 
 // checks if a launch with the given flightNumber exists
 async function launchExists(fligtNumber){
-    return await launches.findOne({
+    return await findLaunch({
         flightNumber: fligtNumber
     });
+}
+
+async function findLaunch(filter){
+    // return a launch based on the filter object 
+    return await launches.findOne(filter);
 }
 
 async function abortLaunchById(flightNumber){
@@ -125,12 +121,120 @@ async function abortLaunchById(flightNumber){
         }
     }
 }
+
+const SPACEX_API_URL = 'https://api.spacexdata.com/v4/launches/query';
+
+async function populateLaunches(){
+    // post request that is similar to get request. The query allows us to see the full 
+    // object of a field that is refrenced by its id in the launche's response. 
+    // See full note at the bottom of this file
+    
+    const response = await axios.post(SPACEX_API_URL, {
+        query: {},
+        options: {
+            // specifiy the page number
+            // page: 2,
+            // specify the number of launches to display per page 
+            // limit: 20,
+            // turn off pagination, response will be slower and larger because more data is being fetched  
+            pagination: false,
+            populate: [
+                {
+                    path: 'rocket',
+                    select: {
+                        name: 1
+                    }
+                },
+                {
+                    // Display the 'customers' field from the payloads object that is being 
+                    // referenced in this launch response 
+                    path: 'payloads',
+                    select: {
+                        'customers': 1
+                    }
+                }
+            ]
+        }
+    });
+
+    if(response.status !== 200){
+        console.log('Problem downloading launch data');
+        throw new Error('Launch data download failed');
+    }
+
+    const launchDocs = response.data.docs;
+    // iterate through each launch returned in the "docs" array 
+    for(const launchDoc of launchDocs){
+        // Convert each launch returned from the SpaceX API into a launch object 
+        // that agrees with the mongoDB launch schema
+
+        const payloads = launchDoc['payloads'];
+        // flatMap function gets all of the customers from all the payloads in this launch 
+        const customers = payloads.flatMap((payload) => {
+            return payload['customers'];
+        })
+
+        const launch = {
+            flightNumber: launchDoc['flight_number'],
+            mission: launchDoc['name'],
+            rocket: launchDoc['rocket']['name'],
+            launchDate: launchDoc['date_local'],
+            upcoming: launchDoc['upcoming'],
+            success: launchDoc['success'],
+            customers: customers
+        };
+
+        console.log(`flightNumber: ${launch.flightNumber}, mission: ${launch.mission}`)
+
+        await saveLaunch(launch);
+    }
+}
+
+
+async function loadLaunchesData(){
+
+    console.log('Downloading launch data from SpaceX API');
+    const firstLaunch =  await findLaunch({
+        flightNumber: 1,
+        rocket: 'Falcon 1',
+        mission: 'FalconSat'
+    });
+
+    if(firstLaunch){
+        console.log('Launch data has already been loaded');
+        
+    } 
+    else {
+        await populateLaunches();
+    }
+
+    
+}
 module.exports = {
     getAllLaunches,
     addNewLaunch,
     abortLaunchById,
+    loadLaunchesData,
     launchExists
 }
 
 
 
+/*
+    Note: loadLaunchData
+        For example, the following body will return the name of the rocket in the launch response
+        {
+            "query": {},
+            "options": {
+                "populate": [
+                    {
+                        "path": "rocket",
+                        "select": {
+                            "name": 1
+                        }
+                    }
+                ]
+            }
+        }
+        if this were just a regular GET request, the launch response would only contain the rocket's unique ID 
+    */

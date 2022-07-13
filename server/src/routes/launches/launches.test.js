@@ -20,7 +20,7 @@ describe('Launches API', () => {
         test('It should respond with 200 success', async () => {
             // the request requires the application's server as a parameter 
             const repsonse = await request(app)
-            .get('/launches')
+            .get('/v1/launches')
             // checks the the content type is an application-json 
             .expect('Content-Type', /json/)
             // we expect the status code to be 200
@@ -56,7 +56,7 @@ describe('Launches API', () => {
         }
         test('It should respond with 201 created', async () => {
             const response = await request(app)
-                .post('/launches')
+                .post('/v1/launches')
                 // body that needs to be sent in the post request 
                 .send(completeLaunchData)
                 // checks the the content type is an application-json 
@@ -73,7 +73,7 @@ describe('Launches API', () => {
 
         test('It should catch missing required properties', async () => {
             const response = await request(app)
-                .post('/launches')
+                .post('/v1/launches')
                 // body that needs to be sent in the post request 
                 .send(launchDataWithoutDate)
                 // checks the the content type is an application-json 
@@ -89,7 +89,7 @@ describe('Launches API', () => {
 
         test('It should catch invalid dates', async () => {
             const response = await request(app)
-                .post('/launches')
+                .post('/v1/launches')
                 // body that needs to be sent in the post request 
                 .send(launchDataWithInvalidDate)
                 // checks the the content type is an application-json 

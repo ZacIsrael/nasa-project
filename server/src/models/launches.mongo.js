@@ -24,10 +24,11 @@ const launchesSchema = new mongoose.Schema({
     },
     target: {
         type: String,
-        required: true
+        
         // the target must reference a planet in our 'Planet" collection. not ideal for MongoDB, only good for SQL
         // type: mongoose.ObjectId,
         // ref: 'Planet'
+        // required: true
 
     },
     upcoming: {

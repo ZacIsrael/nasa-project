@@ -2,9 +2,10 @@
 
 const mongoose = require('mongoose');
 
+require('dotenv').config();
 
 // url used to connect to the MongoDB NasaCluster 
-const MONGO_URL = 'mongodb+srv://nasa-api:EE5EzjZ2ZoxifaId@nasacluster.jrmr0.mongodb.net/nasa?retryWrites=true&w=majority'
+const MONGO_URL = process.env.MONGO_URL;
 
 
 // Event emitter that emits events when the connection is ready 
