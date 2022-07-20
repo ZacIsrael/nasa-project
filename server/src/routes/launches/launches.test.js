@@ -5,6 +5,7 @@
 const request = require('supertest');
 const { response } = require('../../app');
 const app = require('../../app');
+const { loadPlanetsData } = require('../../models/planets.models');
 const { mongoConnect, mongoDisconnect } = require('../../services/mongo');
 
 
@@ -13,6 +14,8 @@ describe('Launches API', () => {
     beforeAll(async () => {
         // whatever is in this call back must be run before all the tests are excuted 
         await mongoConnect();
+        // needed for testing & building when commiting to git (GitHub Actions)
+        await loadPlanetsData();
     })
 
     describe('TEST GET /launches', () => {
