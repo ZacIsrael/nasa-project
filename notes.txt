@@ -4,6 +4,7 @@ client: folder that contains the frontend code
 
 Hooks are React's way of responding to events 
 
+
 Whitelisting is the practice of explicitly allowing access to a particular
 privilege or service. It is the opposite of blacklisting.
 
@@ -16,7 +17,7 @@ for every router
 multiple controllers for each model. There is a many-to-many relationship 
 between controllers and models 
 
-- Models: Give us data access functions that controls how the data can be written to and read 
+- Models: Give us data access functions that control how the data can be written to and read 
 
 - Controllers: Focus on working with the request and the response 
 

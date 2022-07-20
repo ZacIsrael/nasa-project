@@ -10,7 +10,7 @@ const path = require('path');
 // the machine, and the browser that they're using.
 const morgan = require('morgan');
 
-//  api
+//  version 1 of the api
 const api_v1 = require('./routes/api-v1');
 
 const planetsRouter = require('./routes/planets/planets.router');

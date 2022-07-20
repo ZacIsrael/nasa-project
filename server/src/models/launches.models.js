@@ -41,14 +41,13 @@ async function getAllLaunches(skip, limit){
     })
     // sort the returned launch documents by flightNumber: -1 = descending, 1 = ascending
     .sort({ flightNumber: 1})
-    // use skip and limit functions to implement pagination 
+    // skip tells monog how many documents to skeep before going to the next page (pagination)
     .skip(skip)
-    // limit the amount of documents that are returned from Mongo DB
+    // limit is the amount of documents per page 
     .limit(limit);
 }
 
 async function saveLaunch(launch){
-
 
     // findOneAndUpdate only returns the properties that are set in the update (in the launch object)
     await launches.findOneAndUpdate({
@@ -140,6 +139,8 @@ async function populateLaunches(){
             pagination: false,
             populate: [
                 {
+                    // Display the name of the 'rocket' field from that is being referenced
+                    // in this launch response 
                     path: 'rocket',
                     select: {
                         name: 1

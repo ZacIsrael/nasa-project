@@ -3,7 +3,7 @@
 // importing the mongoose module, the most widely used node package for connecting to MongoDB
 const mongoose = require('mongoose');
 
-// create launches schema. Defines the type of each field in he launches collection
+// create launches schema. Defines the type of each field in the launches collection
 const launchesSchema = new mongoose.Schema({
     flightNumber: {
         type: Number,

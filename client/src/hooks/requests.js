@@ -5,7 +5,7 @@ const API_URL = 'http://localhost:8000/v1'
   // Load planets and return as JSON.
 async function httpGetPlanets() {
 
-  // retrieves all of the planets 
+  // uses planet API to retrieve all of the planets 
   const response = await fetch(`${API_URL}/planets`);
   const planets = await response.json();
   return planets;
@@ -15,7 +15,7 @@ async function httpGetPlanets() {
   // Load launches, sort by flight number, and return as JSON.
 async function httpGetLaunches() {
 
-  // retrieves all pf the launches 
+  // uses the launches API to retrieve all of the launches 
   const response = await fetch(`${API_URL}/launches`);
   const launches = await response.json();
   
@@ -28,7 +28,9 @@ async function httpGetLaunches() {
 // Submit given launch data to launch system.
 async function httpSubmitLaunch(launch) {
 
+
   try {
+    // use launches API to send a post request with the launch data input by the end user 
     const response = await fetch(`${API_URL}/launches`, {
       method: 'POST',
       body: JSON.stringify(launch),
@@ -52,7 +54,7 @@ async function httpSubmitLaunch(launch) {
 
  // Delete launch with given ID.
 async function httpAbortLaunch(id) {
-  // TODO: Once API is ready.
+  // Use the launches API to abort a launch
   try {
     const response = await fetch(`${API_URL}/launches/${id}`, {
       method: 'DELETE',

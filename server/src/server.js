@@ -8,9 +8,12 @@ const PORT = process.env.PORT || 8000;
 // importing the mongoose module, the most widely used node package for connecting to MongoDB
 const mongoose = require('mongoose');
 
+// the application 
 const app = require('./app');
 
+// in a real world application, always use https instead because it is secure 
 const http = require('http');
+// create the server with the application 
 const server = http.createServer(app);
 
 
@@ -32,7 +35,7 @@ async function startServer(){
     // request that comes to the server 
     await loadLaunchesData();
 
-    // have the srevr listen on the specified PORT 
+    // have the server listen on the specified PORT 
     server.listen(PORT, () => {
         console.log(`Listening on port ${PORT}...`);
     });
