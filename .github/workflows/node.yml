@@ -7,11 +7,11 @@ on:
     branches: [ main ]
 jobs:
   build:
-  env: 
-    CI: true 
-  strategy:
-    matrix:
-      node-version: [16.x, 17.x, 18.x]
+    env: 
+      CI: true 
+    strategy:
+      matrix:
+        node-version: [16.x, 17.x, 18.x]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
