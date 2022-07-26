@@ -1,6 +1,7 @@
 # Includes all of the instructions to set up the docker container 
 # select the base image using the FROM statement
 FROM node:lts-alpine
+# FROM zac390/nasa-project:latest
 
 # name of the foler where the files will live
 WORKDIR /app
